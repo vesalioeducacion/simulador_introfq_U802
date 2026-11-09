@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>INTRODUCCIÓN A LA FISICOQUÍMICA - Metabolismo y Bioenergética (Facultad de Cs. Médicas - UCCuyo)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Outfit & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <style>
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: #f7f9f6;
+      color: #1e293b;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .font-mono-code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* Paleta Institucional UCCuyo (Verde Oliva) */
+    .text-accent { color: #436600; }
+    .bg-accent { background-color: #436600; }
+    .bg-accent-hover:hover { background-color: #324d00; }
+    .bg-accent-light { background-color: #f1f6eb; }
+    .border-accent { border-color: #436600; }
+
+    .text-primary { color: #436600; }
+    .bg-primary { background-color: #436600; }
+    .bg-primary-dark { background-color: #324d00; }
+    .border-primary { border-color: #436600; }
+    
+    .focus-accent:focus {
+      border-color: #436600;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(67, 102, 0, 0.2);
+    }
+    
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 10px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    .interactive-card {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .interactive-card:hover {
+      transform: translateY(-2px);
+      border-color: #436600;
+      box-shadow: 0 10px 25px -5px rgba(67, 102, 0, 0.12);
+    }
+
+    /* Animaciones de flujo metabólico */
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.6; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+    .pulse-active {
+      animation: pulseGlow 2s infinite ease-in-out;
+    }
+    .flow-dash {
+      stroke-dasharray: 8;
+      animation: dashMove 1.5s linear infinite;
+    }
+    @keyframes dashMove {
+      to { stroke-dashoffset: -16; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-accent/20 text-gray-800">
+
+  <!-- Cabecera Institucional UCCuyo -->
+  <header class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-accent flex items-center justify-center text-white font-bold text-xl shadow-md">
+          FQ
+        </div>
+        <div>
+          <h1 class="text-lg font-bold text-gray-800 tracking-wide uppercase">INTRODUCCIÓN A LA FISICOQUÍMICA</h1>
+          <p class="text-xs text-gray-500 font-semibold">Lic. en Kinesiología y Fisiatría (Facultad de Cs. Médicas - UCCuyo)</p>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-2">
+        <!-- Monitor Global de Homeostasis Celular -->
+        <div class="hidden md:flex items-center gap-3 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 text-xs mr-2">
+          <div class="flex items-center gap-1.5">
+            <i class="fa-solid fa-bolt text-amber-500"></i>
+            <div>
+              <span class="text-slate-400 block text-[9px] uppercase font-bold">ATP/ADP</span>
+              <div class="flex items-center gap-1.5">
+                <div class="w-14 bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                  <div id="atp-meter-bar" class="bg-amber-500 h-full w-[78%] transition-all duration-500"></div>
+                </div>
+                <span id="atp-meter-val" class="font-bold text-amber-700 font-mono text-[10px]">0.78</span>
+              </div>
+            </div>
+          </div>
+          <div class="h-5 w-px bg-slate-200"></div>
+          <div class="flex items-center gap-1.5">
+            <i class="fa-solid fa-plug-circle-bolt text-cyan-600"></i>
+            <div>
+              <span class="text-slate-400 block text-[9px] uppercase font-bold">Redox</span>
+              <span id="redox-meter-val" class="font-bold text-cyan-700 font-mono text-[10px]">0.12</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botón Vademécum Teórico -->
+        <button onclick="openFormulasModal()" class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 text-xs font-semibold rounded-lg border border-gray-200 hover:bg-gray-200 transition">
+          <i class="fa-solid fa-book-bookmark text-accent"></i>
+          <span class="hidden sm:inline">Vademécum</span>
+        </button>
+        <!-- Botón Guía de Uso -->
+        <button onclick="openTutorial()" class="flex items-center gap-1.5 px-3 py-1.5 bg-accent text-white text-xs font-semibold rounded-lg shadow-sm hover:opacity-90 transition">
+          <i class="fa-solid fa-circle-question"></i>
+          <span>Guía de Uso</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido Principal con Barra Lateral -->
+  <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6 flex flex-col lg:flex-row gap-6">
+    
+    <!-- Menú de Navegación Lateral -->
+    <nav class="w-full lg:w-64 flex flex-row lg:flex-col gap-2 bg-white p-3 rounded-2xl shadow-sm border border-gray-100 overflow-x-auto lg:overflow-x-visible whitespace-nowrap lg:whitespace-normal sticky top-20 h-fit shrink-0">
+      <button onclick="switchTab('module-1')" id="tab-btn-module-1" class="bg-accent text-white flex-1 lg:flex-none text-left py-2.5 px-4 rounded-xl text-sm font-semibold transition shadow-sm flex items-center gap-2">
+        <i class="fa-solid fa-link"></i> <span>1. Visión & Acoplamiento</span>
+      </button>
+      <button onclick="switchTab('module-2')" id="tab-btn-module-2" class="text-gray-700 hover:bg-gray-100 flex-1 lg:flex-none text-left py-2.5 px-4 rounded-xl text-sm font-medium transition flex items-center gap-2">
+        <i class="fa-solid fa-fire text-amber-600"></i> <span>2. Lab Catabólico</span>
+      </button>
+      <button onclick="switchTab('module-3')" id="tab-btn-module-3" class="text-gray-700 hover:bg-gray-100 flex-1 lg:flex-none text-left py-2.5 px-4 rounded-xl text-sm font-medium transition flex items-center gap-2">
+        <i class="fa-solid fa-cubes text-emerald-600"></i> <span>3. Lab Anabólico</span>
+      </button>
+      <button onclick="switchTab('module-4')" id="tab-btn-module-4" class="text-gray-700 hover:bg-gray-100 flex-1 lg:flex-none text-left py-2.5 px-4 rounded-xl text-sm font-medium transition flex items-center gap-2">
+        <i class="fa-solid fa-microscope text-indigo-600"></i> <span>4. Topografía & Casos</span>
+      </button>
+    </nav>
+
+    <!-- Área de Contenido Dinámico -->
+    <div class="flex-1 space-y-6 min-w-0">
+
+        <!-- ============================================================ -->
+        <!-- MÓDULO 1: ACOPLAMIENTO ENERGÉTICO Y REDOX                     -->
+        <!-- ============================================================ -->
+        <section id="module-1" class="tab-pane space-y-6">
+            <!-- Introducción Pedagógica -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                <div class="flex items-center justify-between flex-wrap gap-4 border-b border-slate-100 pb-4 mb-4">
+                    <div>
+                        <span class="text-xs font-bold text-inst-700 uppercase tracking-wider bg-inst-100 px-2.5 py-1 rounded-md">Bioenergética Fundamental</span>
+                        <h2 class="text-xl font-bold text-inst-800 mt-1">El Acoplamiento Termodinámico y las Reacciones Redox</h2>
+                    </div>
+                    <div class="text-xs bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg border border-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-info text-blue-500"></i> Ley de Hess & Primer Principio de la Termodinámica
+                    </div>
+                </div>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    Las células no violan las leyes termodinámicas. Los procesos biosintéticos endergónicos (<span class="font-semibold text-synthesis-600">&Delta;G > 0</span>) no pueden ocurrir de forma espontánea; son forzados a suceder al acoplarse físicamente a reacciones catabólicas fuertemente exergónicas (<span class="font-semibold text-catabolic-600">&Delta;G < 0</span>), principalmente la hidrólisis del enlace fosfoanhídrido de alta energía del <span class="font-bold text-amber-600">ATP</span> y el flujo espontáneo de electrones en pares de óxido-reducción.
+                </p>
+            </div>
+
+            <!-- Laboratorio Interactivo de Acoplamiento ΔG -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Simulador de Reacción Acoplada -->
+                <div class="lg:col-span-7 bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-inst-800 flex items-center gap-2 text-sm">
+                                <i class="fa-solid fa-chart-line text-blue-600"></i> Simulador de Balance de Energía Libre de Gibbs (&Delta;G&deg;')
+                            </h3>
+                            <span id="thermo-status" class="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800">Espontánea (Viable)</span>
+                        </div>
+
+                        <!-- Selector de Reacción Endergónica Biosintética -->
+                        <div class="space-y-4 text-xs">
+                            <div>
+                                <label class="font-semibold text-slate-700 block mb-1">1. Seleccionar Proceso Endergónico Fisiológico (&Delta;G₁ > 0):</label>
+                                <select id="endergonic-select" onchange="calculateCoupling()" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 font-medium text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <option value="13.8" data-desc="Glucosa + Pi &rarr; Glucosa-6-Fosfato (Inicio de la glucólisis / retención intracelular)">Fosforilación de Glucosa (+13.8 kJ/mol)</option>
+                                    <option value="31.4" data-desc="Glutamo + NH3 &rarr; Glutamina (Destoxificación de amonio y síntesis proteica)">Síntesis de Glutamina (+31.4 kJ/mol)</option>
+                                    <option value="21.0" data-desc="Glicerol-3-P + Ácido Graso &rarr; Acil-glicerol (Lipogénesis)">Esterificación de Ácidos Grasos (+21.0 kJ/mol)</option>
+                                    <option value="42.0" data-desc="Aminoácido + ARNt &rarr; Aminoacil-ARNt (Carga para síntesis muscular)">Activación de Aminoácido (+42.0 kJ/mol)</option>
+                                </select>
+                                <p id="endergonic-desc" class="text-[11px] text-slate-500 mt-1 italic">Glucosa + Pi &rarr; Glucosa-6-Fosfato (Inicio de glucólisis celular)</p>
+                            </div>
+
+                            <!-- Selector de Mecanismo de Acoplamiento Exergónico -->
+                            <div>
+                                <label class="font-semibold text-slate-700 block mb-1">2. Mecanismo Exergónico Conductor (&Delta;G₂ < 0):</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <label class="flex items-center gap-2 p-2.5 border rounded-lg cursor-pointer bg-amber-50/50 border-amber-200">
+                                        <input type="radio" name="exergonic-drive" value="-30.5" checked onchange="calculateCoupling()" class="text-amber-500 focus:ring-amber-400">
+                                        <div>
+                                            <span class="font-bold text-slate-800 block text-xs">Hidrólisis de 1 ATP</span>
+                                            <span class="text-[10px] text-slate-500">-30.5 kJ/mol (Fisiológico: ~ -50)</span>
+                                        </div>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-2.5 border rounded-lg cursor-pointer bg-slate-50 border-slate-200">
+                                        <input type="radio" name="exergonic-drive" value="-61.0" onchange="calculateCoupling()" class="text-amber-500">
+                                        <div>
+                                            <span class="font-bold text-slate-800 block text-xs">Hidrólisis de 2 ATP (o ATP &rarr; AMP + PPi)</span>
+                                            <span class="text-[10px] text-slate-500">-61.0 kJ/mol (Doble enlace fosfato)</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Gráfico Visual de Coordenadas de Reacción -->
+                        <div class="mt-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <div class="flex justify-between items-center text-xs mb-2">
+                                <span class="font-bold text-slate-700">Perfil de Energía Libre Acoplada</span>
+                                <div class="flex gap-4">
+                                    <span class="flex items-center gap-1 text-[11px] text-red-500 font-semibold"><span class="w-2.5 h-2.5 rounded-full bg-red-500 inline-block"></span> Endergónica aislada</span>
+                                    <span class="flex items-center gap-1 text-[11px] text-emerald-600 font-semibold"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Vía Acoplada Neta</span>
+                                </div>
+                            </div>
+                            <svg class="w-full h-36 bg-white rounded-lg border border-slate-100 p-2" viewBox="0 0 400 120">
+                                <!-- Líneas de referencia de energía cero -->
+                                <line x1="30" y1="90" x2="380" y2="90" stroke="#cbd5e1" stroke-dasharray="3,3" />
+                                <text x="5" y="93" font-size="9" fill="#94a3b8">G=0</text>
+
+                                <!-- Curva No Acoplada (Sube en energía) -->
+                                <path id="svg-unfav-path" d="M 40,90 Q 140,20 220,50" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="4,4" />
+                                <text x="225" y="52" font-size="9" fill="#ef4444" font-weight="bold">+&Delta;G (No espontánea)</text>
+
+                                <!-- Curva Acoplada con ATP (Baja neta) -->
+                                <path id="svg-coupled-path" d="M 40,90 Q 120,40 210,105" fill="none" stroke="#10b981" stroke-width="3" />
+                                <circle cx="210" cy="105" r="4" fill="#10b981" />
+                                <text id="svg-coupled-text" x="220" y="108" font-size="10" fill="#047857" font-weight="bold">&Delta;G Global < 0</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Panel de Ecuación Neta -->
+                    <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between flex-wrap gap-2">
+                        <div class="text-xs">
+                            <span class="text-slate-500 block">&Delta;G&deg;' Global = &Delta;G₁ + &Delta;G₂</span>
+                            <span id="equation-display" class="font-mono-code font-bold text-inst-800 text-sm">(+13.8) + (-30.5) = -16.7 kJ/mol</span>
+                        </div>
+                        <div id="equation-badge" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-synthesis-50 text-synthesis-600 border border-synthesis-500/30">
+                            Reacción Favorable Termodinámicamente
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Acoplamiento Redox y Coenzimas -->
+                <div class="lg:col-span-5 bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-inst-800 flex items-center gap-2 text-sm">
+                                <i class="fa-solid fa-shuffle text-cyan-600"></i> Lanzadera de Electrones Redox (NAD⁺ / NADH)
+                            </h3>
+                            <span class="text-[10px] font-bold uppercase tracking-wider bg-cyan-100 text-cyan-800 px-2 py-0.5 rounded">Fisicoquímica Redox</span>
+                        </div>
+                        <p class="text-xs text-slate-600 mb-4 leading-relaxed">
+                            Las oxidaciones biológicas son deshidrogenaciones: la molécula orgánica pierde 2 electrones y 2 protones (<span class="font-mono-code">2e⁻ + 2H⁺</span>). Estos equivalentes de reducción son capturados por coenzimas móviles.
+                        </p>
+
+                        <!-- Simulador Interactivo de Oxidación de Sustrato -->
+                        <div class="bg-gradient-to-br from-slate-50 to-blue-50/40 p-4 rounded-xl border border-slate-200 space-y-4">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="font-bold text-slate-700">Estado de Sustrato Orgánico:</span>
+                                <button onclick="toggleRedoxState()" id="redox-toggle-btn" class="px-3 py-1 bg-inst-800 text-white rounded-lg font-semibold hover:bg-inst-700 transition shadow-sm text-xs flex items-center gap-1.5">
+                                    <i class="fa-solid fa-arrows-rotate"></i> Oxidación en Vivo
+                                </button>
+                            </div>
+
+                            <!-- Diagrama visual de transferencia de e- -->
+                            <div class="grid grid-cols-11 items-center gap-1 text-center py-2">
+                                <div id="substrate-box" class="col-span-4 p-3 bg-white border-2 border-catabolic-500 rounded-xl shadow-xs transition-all">
+                                    <span class="block text-[10px] font-bold text-catabolic-600 uppercase">Sustrato Inicial</span>
+                                    <span id="substrate-name" class="font-bold text-xs text-slate-800">Malato / Lactato</span>
+                                    <span id="substrate-state" class="block text-[10px] text-emerald-600 font-semibold mt-1">Forma Reducida (Rico en e⁻)</span>
+                                </div>
+
+                                <div class="col-span-3 flex flex-col items-center">
+                                    <span class="text-[10px] font-mono-code font-bold text-blue-600">2e⁻ + H⁺</span>
+                                    <div class="w-full flex items-center justify-center my-1">
+                                        <i id="redox-arrow" class="fa-solid fa-arrow-right text-blue-500 text-lg transition-transform duration-500"></i>
+                                    </div>
+                                    <span class="text-[9px] text-slate-400">Deshidrogenasa</span>
+                                </div>
+
+                                <div id="coenzyme-box" class="col-span-4 p-3 bg-white border-2 border-slate-300 rounded-xl shadow-xs transition-all">
+                                    <span class="block text-[10px] font-bold text-slate-500 uppercase">Coenzima Aceptora</span>
+                                    <span id="coenzyme-name" class="font-bold text-xs text-cyan-700">NAD⁺</span>
+                                    <span id="coenzyme-state" class="block text-[10px] text-slate-500 font-semibold mt-1">Forma Oxidada</span>
+                                </div>
+                            </div>
+
+                            <!-- Explicación Didáctica del Paso -->
+                            <div class="bg-white p-3 rounded-lg border border-slate-200 text-xs">
+                                <span class="font-bold text-inst-800 block mb-0.5 text-[11px]">Ecuación de Semirreacción:</span>
+                                <div class="font-mono-code text-[11px] text-slate-700 bg-slate-50 p-1.5 rounded">
+                                    Sustrato-H₂ + NAD⁺ &harr; Sustrato + NADH + H⁺
+                                </div>
+                                <p id="redox-detail-text" class="text-[11px] text-slate-500 mt-2">
+                                    El sustrato se <strong>oxida</strong> (cede electrones) reduciendo al NAD⁺ a <strong>NADH</strong>, el cual almacena energía electroquímica lista para la cadena de transporte de electrones mitocondrial.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-amber-50 rounded-lg border border-amber-200 text-amber-900 text-xs flex items-start gap-2">
+                        <i class="fa-solid fa-graduation-cap text-amber-600 mt-0.5 text-sm"></i>
+                        <div>
+                            <span class="font-bold block">Articulación con Kinesiología:</span>
+                            En contracciones musculares anaeróbicas de alta intensidad, el reciclaje rápido de NADH a NAD⁺ por la <em>Lactato Deshidrogenasa (LDH)</em> es indispensable para evitar que la glucólisis se detenga por falta del aceptor oxidado.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- MÓDULO 2: LABORATORIO DE CATABOLISMO (RUTAS CONVERGENTES)    -->
+        <!-- ============================================================ -->
+        <section id="module-2" class="tab-pane hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                <div class="flex items-center justify-between flex-wrap gap-4 border-b border-slate-100 pb-4 mb-4">
+                    <div>
+                        <span class="text-xs font-bold text-catabolic-600 uppercase tracking-wider bg-catabolic-50 px-2.5 py-1 rounded-md border border-catabolic-500/20">Fase Catabólica Degradativa</span>
+                        <h2 class="text-xl font-bold text-inst-800 mt-1">Convergencia Metabólica, Oxidación y Generación de ATP</h2>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs">
+                        <span class="px-2.5 py-1 bg-orange-100 text-catabolic-600 font-bold rounded-lg">&Delta;G°' &lt; 0 (Exergónico)</span>
+                        <span class="px-2.5 py-1 bg-blue-100 text-blue-700 font-bold rounded-lg">Rutas Convergentes</span>
+                    </div>
+                </div>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    El catabolismo se caracteriza por ser <strong>oxidativo y convergente</strong>: macromoléculas químicamente dispares (carbohidratos, lípidos, proteínas) son fragmentadas paso a paso en pocas moléculas comunes, canalizándose casi en su totalidad hacia el intermediario central <strong>Acetil-CoA</strong>, para ingresar al Ciclo del Ácido Cítrico (Krebs) dentro de la mitocondria.
+                </p>
+            </div>
+
+            <!-- Interfaz Interactiva de Rutas Catabólicas -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Selector y Visualizador de Ruta Catabólica Específica -->
+                <div class="lg:col-span-8 bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                    <!-- Selector de Ruta -->
+                    <div class="flex items-center justify-between flex-wrap gap-2 mb-6">
+                        <span class="text-xs font-bold text-slate-700">Explorar Ruta Catabólica:</span>
+                        <div class="flex gap-2">
+                            <button onclick="loadCatabolicPathway('glycolysis')" id="btn-path-glycolysis" class="cat-path-btn px-3 py-1.5 text-xs font-bold rounded-lg bg-catabolic-500 text-white transition shadow-sm">
+                                1. Glucólisis Citosólica
+                            </button>
+                            <button onclick="loadCatabolicPathway('betaox')" id="btn-path-betaox" class="cat-path-btn px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                                2. &beta;-Oxidación Mitocondrial
+                            </button>
+                            <button onclick="loadCatabolicPathway('krebs')" id="btn-path-krebs" class="cat-path-btn px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                                3. Ciclo de Krebs (8 Pasos)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Diagrama Dinámico del Camino Seleccionado -->
+                    <div id="pathway-diagram-box" class="bg-slate-50 border border-slate-200 rounded-xl p-5 min-h-[360px] flex flex-col justify-between">
+                        <!-- El contenido se inyecta dinámicamente con loadCatabolicPathway() -->
+                    </div>
+
+                    <!-- Balance Estequiométrico y Rendimiento Energético -->
+                    <div class="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                        <div class="bg-amber-50 p-3 rounded-xl border border-amber-200">
+                            <span class="block text-[10px] uppercase font-bold text-amber-700">ATP Neto Directo</span>
+                            <span id="cat-atp-yield" class="text-lg font-black text-amber-900 font-mono-code">+2 ATP</span>
+                        </div>
+                        <div class="bg-cyan-50 p-3 rounded-xl border border-cyan-200">
+                            <span class="block text-[10px] uppercase font-bold text-cyan-700">NADH Producido</span>
+                            <span id="cat-nadh-yield" class="text-lg font-black text-cyan-900 font-mono-code">2 NADH</span>
+                        </div>
+                        <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-200">
+                            <span class="block text-[10px] uppercase font-bold text-indigo-700">FADH₂ Producido</span>
+                            <span id="cat-fadh-yield" class="text-lg font-black text-indigo-900 font-mono-code">0 FADH₂</span>
+                        </div>
+                        <div class="bg-orange-50 p-3 rounded-xl border border-orange-200">
+                            <span class="block text-[10px] uppercase font-bold text-catabolic-600">Intermediario Final</span>
+                            <span id="cat-final-prod" class="text-sm font-bold text-orange-900 font-mono-code">2 Piruvato</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel Didáctico: El Embudo de Convergencia Catabólica -->
+                <div class="lg:col-span-4 bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-inst-800 text-sm mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-filter text-catabolic-500"></i> Embudo de Convergencia Catabólica
+                        </h3>
+                        <p class="text-xs text-slate-600 mb-4">
+                            Observa cómo sustratos iniciales químicamente heterogéneos convergen hacia un único punto central de entrada a la respiración celular:
+                        </p>
+
+                        <!-- Esquema Gráfico SVG del Embudo -->
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <svg class="w-full h-48" viewBox="0 0 280 200">
+                                <!-- Polímeros de entrada -->
+                                <rect x="10" y="10" width="75" height="26" rx="6" fill="#fef3c7" stroke="#d97706" />
+                                <text x="47" y="27" font-size="9" font-weight="bold" fill="#78350f" text-anchor="middle">Carbohidratos</text>
+
+                                <rect x="102" y="10" width="75" height="26" rx="6" fill="#fed7aa" stroke="#ea580c" />
+                                <text x="139" y="27" font-size="9" font-weight="bold" fill="#7c2d12" text-anchor="middle">Lípidos (TG)</text>
+
+                                <rect x="195" y="10" width="75" height="26" rx="6" fill="#fbcfe8" stroke="#db2777" />
+                                <text x="232" y="27" font-size="9" font-weight="bold" fill="#831843" text-anchor="middle">Proteínas</text>
+
+                                <!-- Flechas hacia intermediarios -->
+                                <line x1="47" y1="36" x2="47" y2="70" stroke="#d97706" stroke-width="2" marker-end="url(#arrow)" />
+                                <line x1="139" y1="36" x2="139" y2="70" stroke="#ea580c" stroke-width="2" />
+                                <line x1="232" y1="36" x2="232" y2="70" stroke="#db2777" stroke-width="2" />
+
+                                <!-- Monómeros -->
+                                <rect x="15" y="70" width="65" height="22" rx="4" fill="#fff" stroke="#cbd5e1" />
+                                <text x="47" y="85" font-size="8" fill="#334155" text-anchor="middle">Glucosa</text>
+
+                                <rect x="107" y="70" width="65" height="22" rx="4" fill="#fff" stroke="#cbd5e1" />
+                                <text x="139" y="85" font-size="8" fill="#334155" text-anchor="middle">Ác. Grasos</text>
+
+                                <rect x="200" y="70" width="65" height="22" rx="4" fill="#fff" stroke="#cbd5e1" />
+                                <text x="232" y="85" font-size="8" fill="#334155" text-anchor="middle">Aminoácidos</text>
+
+                                <!-- Convergencia Diagonal -->
+                                <line x1="47" y1="92" x2="120" y2="125" stroke="#f97316" stroke-width="2" />
+                                <line x1="139" y1="92" x2="139" y2="125" stroke="#f97316" stroke-width="2" />
+                                <line x1="232" y1="92" x2="160" y2="125" stroke="#f97316" stroke-width="2" />
+
+                                <!-- Cuello de botella: Acetil-CoA -->
+                                <rect x="80" y="125" width="120" height="28" rx="8" fill="#ea580c" />
+                                <text x="140" y="143" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">ACETIL-CoA</text>
+
+                                <!-- Entrada al Ciclo de Krebs -->
+                                <line x1="140" y1="153" x2="140" y2="170" stroke="#162144" stroke-width="2.5" />
+                                <circle cx="140" cy="185" r="14" fill="#162144" />
+                                <text x="140" y="188" font-size="8" font-weight="bold" fill="#38bdf8" text-anchor="middle">KREBS</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-slate-100 rounded-xl border border-slate-200 text-xs">
+                        <span class="font-bold text-inst-800 block mb-1">Destino de los Electrones:</span>
+                        El NADH y FADH₂ obtenidos en estas vías se dirigen a los complejos I y II de la <strong>cadena respiratoria</strong> en las crestas mitocondriales, generando el gradiente quimiosmótico de protones propuesto por Mitchell para la síntesis masiva de ATP por la <em>ATP sintasa</em>.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- MÓDULO 3: ESTACIÓN DE ANABOLISMO (RUTAS DIVERGENTES)         -->
+        <!-- ============================================================ -->
+        <section id="module-3" class="tab-pane hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                <div class="flex items-center justify-between flex-wrap gap-4 border-b border-slate-100 pb-4 mb-4">
+                    <div>
+                        <span class="text-xs font-bold text-synthesis-600 uppercase tracking-wider bg-synthesis-50 px-2.5 py-1 rounded-md border border-synthesis-500/20">Fase Anabólica Biosintética</span>
+                        <h2 class="text-xl font-bold text-inst-800 mt-1">Divergencia Molecular, Reducción y Construcción Tisular</h2>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs">
+                        <span class="px-2.5 py-1 bg-emerald-100 text-synthesis-600 font-bold rounded-lg">&Delta;G°' &gt; 0 (Endergónico)</span>
+                        <span class="px-2.5 py-1 bg-purple-100 text-purple-700 font-bold rounded-lg">Rutas Divergentes</span>
+                    </div>
+                </div>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    A diferencia del catabolismo, el anabolismo es <strong>reductivo, endergónico y divergente</strong>: a partir de un número muy reducido de precursores moleculares simples, la maquinaria enzimática sintetiza una inmensa diversidad de macromoléculas complejas que componen las estructuras corporales y los depósitos de energía.
+                </p>
+            </div>
+
+            <!-- Panel Interactivo de Divergencia y Costo Energético -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Selector Interactivo de Síntesis Tisular -->
+                <div class="lg:col-span-8 bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                    <h3 class="font-bold text-inst-800 text-sm mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-shapes text-synthesis-500"></i> Estación de Biosíntesis Específica
+                    </h3>
+
+                    <!-- Selector de Macromolécula a sintetizar -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
+                        <button onclick="loadAnabolicPathway('protein')" id="btn-ana-protein" class="ana-btn p-3 rounded-xl border text-left transition-all border-synthesis-500 bg-synthesis-50 text-synthesis-600 shadow-xs">
+                            <i class="fa-solid fa-dumbbell block text-base mb-1"></i>
+                            <span class="font-bold text-xs block">Proteínas</span>
+                            <span class="text-[10px] text-slate-500">Miofibrillas musculares</span>
+                        </button>
+                        <button onclick="loadAnabolicPathway('glycogen')" id="btn-ana-glycogen" class="ana-btn p-3 rounded-xl border text-left transition-all border-slate-200 bg-white text-slate-700 hover:bg-slate-50">
+                            <i class="fa-solid fa-cubes-stacked block text-base mb-1 text-amber-500"></i>
+                            <span class="font-bold text-xs block">Glucógeno</span>
+                            <span class="text-[10px] text-slate-500">Reserva hepato-muscular</span>
+                        </button>
+                        <button onclick="loadAnabolicPathway('fattyacids')" id="btn-ana-fattyacids" class="ana-btn p-3 rounded-xl border text-left transition-all border-slate-200 bg-white text-slate-700 hover:bg-slate-50">
+                            <i class="fa-solid fa-droplet block text-base mb-1 text-cyan-500"></i>
+                            <span class="font-bold text-xs block">Ácidos Grasos</span>
+                            <span class="text-[10px] text-slate-500">Lipogénesis citosólica</span>
+                        </button>
+                        <button onclick="loadAnabolicPathway('triglycerides')" id="btn-ana-triglycerides" class="ana-btn p-3 rounded-xl border text-left transition-all border-slate-200 bg-white text-slate-700 hover:bg-slate-50">
+                            <i class="fa-solid fa-layer-group block text-base mb-1 text-orange-500"></i>
+                            <span class="font-bold text-xs block">Triglicéridos</span>
+                            <span class="text-[10px] text-slate-500">Adipocito de reserva</span>
+                        </button>
+                    </div>
+
+                    <!-- Visualización del Proceso Anabólico -->
+                    <div id="ana-pathway-card" class="bg-slate-50 border border-slate-200 rounded-xl p-5 min-h-[280px]">
+                        <!-- Contenido inyectado dinámicamente -->
+                    </div>
+
+                    <!-- Indicadores de Demanda de Recursos -->
+                    <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="bg-red-50 p-3 rounded-xl border border-red-200 text-center">
+                            <span class="text-[10px] uppercase font-bold text-red-700 block">Inversión de ATP/GTP</span>
+                            <span id="ana-atp-cost" class="font-mono-code text-base font-black text-red-900">-4 Enlaces &sim;P / residuo</span>
+                        </div>
+                        <div class="bg-cyan-50 p-3 rounded-xl border border-cyan-200 text-center">
+                            <span class="text-[10px] uppercase font-bold text-cyan-700 block">Poder Reductor (NADPH)</span>
+                            <span id="ana-nadph-cost" class="font-mono-code text-base font-black text-cyan-900">0 NADPH</span>
+                        </div>
+                        <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-200 text-center">
+                            <span class="text-[10px] uppercase font-bold text-emerald-700 block">Objetivo Fisiológico</span>
+                            <span id="ana-physio-target" class="text-xs font-bold text-emerald-900">Hipertrofia y Reparación</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comparador Conceptual Catabolismo vs Anabolismo -->
+                <div class="lg:col-span-4 bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-inst-800 text-sm mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-code-compare text-blue-600"></i> Cuadro Fisicoquímico Comparativo
+                        </h3>
+
+                        <div class="space-y-3 text-xs">
+                            <div class="p-3 bg-catabolic-50/60 rounded-xl border border-catabolic-500/20">
+                                <span class="font-bold text-catabolic-600 flex items-center gap-1.5 mb-1">
+                                    <i class="fa-solid fa-circle-minus"></i> Catabolismo (Degradación)
+                                </span>
+                                <ul class="space-y-1 text-slate-600 text-[11px] list-disc list-inside">
+                                    <li>Termodinámica: <strong>Exergónico (&Delta;G &lt; 0)</strong></li>
+                                    <li>Mec. Redox: <strong>Oxidación de sustratos</strong></li>
+                                    <li>Geometría: <strong>Ruta Convergente</strong></li>
+                                    <li>Coenzimas: <strong>Produce NADH y FADH₂</strong></li>
+                                </ul>
+                            </div>
+
+                            <div class="p-3 bg-synthesis-50/60 rounded-xl border border-synthesis-500/20">
+                                <span class="font-bold text-synthesis-600 flex items-center gap-1.5 mb-1">
+                                    <i class="fa-solid fa-circle-plus"></i> Anabolismo (Síntesis)
+                                </span>
+                                <ul class="space-y-1 text-slate-600 text-[11px] list-disc list-inside">
+                                    <li>Termodinámica: <strong>Endergónico (&Delta;G &gt; 0)</strong></li>
+                                    <li>Mec. Redox: <strong>Reducción de precursores</strong></li>
+                                    <li>Geometría: <strong>Ruta Divergente</strong></li>
+                                    <li>Coenzimas: <strong>Consume ATP y NADPH</strong></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-blue-50 rounded-xl border border-blue-200 text-blue-900 text-xs">
+                        <span class="font-bold block mb-1">Rol en Kinesiología y Rehabilitación:</span>
+                        Tras una sesión de entrenamiento excéntrico que causa microrroturas sarcoméricas, se produce una cascada que estimula la vía anabólica <em>mTOR</em>, incrementando drásticamente la síntesis proteica para regenerar la miosina y la actina muscular.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- MÓDULO 4: COMPARTIMENTALIZACIÓN Y CASOS CLÍNICOS             -->
+        <!-- ============================================================ -->
+        <section id="module-4" class="tab-pane hidden space-y-6">
+            <!-- Introducción de Compartimentalización Celular -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                <div class="flex items-center justify-between flex-wrap gap-4 border-b border-slate-100 pb-4 mb-4">
+                    <div>
+                        <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider bg-indigo-50 px-2.5 py-1 rounded-md border border-indigo-200">Topografía Bioquímica</span>
+                        <h2 class="text-xl font-bold text-inst-800 mt-1">Compartimentalización Celular y Estados Fisiológicos</h2>
+                    </div>
+                    <!-- Selector de Estado Fisiológico Dinámico -->
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-semibold text-slate-600">Estado Celular:</span>
+                        <select id="state-select" onchange="updatePhysiologicalState()" class="text-xs font-bold bg-slate-100 text-inst-800 border border-slate-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none">
+                            <option value="rest">Reposo Postprandial (Insulina elevada)</option>
+                            <option value="exercise">Ejercicio Intenso (Demanda aguda de ATP)</option>
+                            <option value="fasting">Ayuno Fisiológico Prolongado (Glucagón alto)</option>
+                        </select>
+                    </div>
+                </div>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    Las células eucariotas segregan espacialmente sus enzimas para evitar ciclos fútiles (degradar y sintetizar simultáneamente una misma molécula). La <strong>mitocondria</strong> actúa como central catabólica aeróbica generadora de energía, mientras que el <strong>citosol</strong> alberga la síntesis de macromoléculas y la glucólisis anaeróbica.
+                </p>
+            </div>
+
+            <!-- Simulador Visual de la Célula y Tráfico Metabólico -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Esquema Interactivo Citosol vs Mitocondria -->
+                <div class="lg:col-span-7 bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-inst-800 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-microscope text-indigo-600"></i> Topología: Citosol vs. Mitocondria
+                        </h3>
+                        <span id="state-indicator-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">
+                            Estado: Reposo Postprandial
+                        </span>
+                    </div>
+
+                    <!-- Representación Gráfica de la Célula -->
+                    <div class="relative w-full h-80 bg-gradient-to-br from-blue-50/60 to-slate-100 rounded-2xl border-2 border-dashed border-blue-300 p-4 overflow-hidden flex flex-col justify-between">
+                        <!-- Etiqueta Citosol -->
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-blue-900 bg-white/80 px-2 py-1 rounded-md shadow-xs border border-blue-200">
+                                <i class="fa-solid fa-water text-blue-500 mr-1"></i> CITOSOL
+                            </span>
+                            <div id="cytosol-activity-tags" class="flex gap-1.5 flex-wrap">
+                                <!-- Tags dinámicos según estado -->
+                            </div>
+                        </div>
+
+                        <!-- Rutas Citosólicas Visuales -->
+                        <div id="cytosol-routes" class="space-y-1 text-xs">
+                            <!-- Inyectado por JS -->
+                        </div>
+
+                        <!-- Estructura Mitocondrial -->
+                        <div class="w-full bg-gradient-to-r from-orange-100/90 to-amber-100/90 border-2 border-catabolic-500 rounded-xl p-3 shadow-md relative">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-extrabold text-catabolic-600 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-shield-halved"></i> MATRIZ MITOCONDRIAL (Central Catabólica)
+                                </span>
+                                <span id="mito-status-badge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-catabolic-500 text-white">Activa</span>
+                            </div>
+
+                            <div id="mito-routes" class="grid grid-cols-2 gap-2 text-xs">
+                                <!-- Inyectado por JS -->
+                            </div>
+
+                            <!-- Membrana Interna y Transporte -->
+                            <div class="mt-2 pt-2 border-t border-orange-300/60 flex items-center justify-between text-[10px] text-slate-600">
+                                <span>Lanzadera de Carnitina (&beta;-ox)</span>
+                                <span>Cadena Respiratoria + ATP Sintasa</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Descripción Médica del Estado Seleccionado -->
+                    <div id="state-description-box" class="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700">
+                        <!-- Inyectado dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- Casos Prácticos Aplicados (Medicina & Kinesiología) -->
+                <div class="lg:col-span-5 bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-inst-800 text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-user-doctor text-emerald-600"></i> Desafío Clínico-Kinesiológico
+                            </h3>
+                            <span class="text-xs font-semibold text-accent bg-accent-light px-2.5 py-1 rounded-full border border-accent/20">Evaluación Formativa</span>
+                        </div>
+
+                        <!-- Tarjeta del Caso Práctico -->
+                        <div id="case-card" class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span id="case-number" class="text-[10px] font-bold uppercase bg-blue-600 text-white px-2 py-0.5 rounded">Caso 1</span>
+                                <span id="case-category" class="text-xs font-bold text-inst-800">Kinesiología Deportiva</span>
+                            </div>
+                            <p id="case-question" class="text-xs text-slate-700 font-medium mb-4 leading-relaxed">
+                                Un corredor de fondo entra en fatiga extrema en el km 35 tras agotar el glucógeno muscular y hepático. ¿Qué adaptación fisicoquímica y metabólica predominará en sus mitocondrias para continuar la contracción muscular?
+                            </p>
+
+                            <!-- Opciones de Respuesta -->
+                            <div id="case-options" class="space-y-2 text-xs">
+                                <!-- Opciones inyectadas por JS -->
+                            </div>
+
+                            <!-- Retroalimentación Pedagógica -->
+                            <div id="case-feedback" class="mt-4 hidden p-3 rounded-lg text-xs"></div>
+                        </div>
+                    </div>
+
+                    <!-- Navegación entre casos -->
+                    <div class="flex justify-between items-center mt-4 pt-3 border-t border-slate-100">
+                        <button onclick="prevCase()" class="text-xs font-semibold text-slate-500 hover:text-inst-800">
+                            <i class="fa-solid fa-arrow-left"></i> Anterior
+                        </button>
+                        <button onclick="nextCase()" class="px-3 py-1.5 bg-inst-800 hover:bg-inst-700 text-white text-xs font-bold rounded-lg transition shadow-xs">
+                            Siguiente Caso <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL VADEMÉCUM TEÓRICO: METABOLISMO Y BIOENERGÉTICA                      -->
+  <!-- ========================================================================= -->
+  <div id="modal-formulas" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white max-w-3xl w-full rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="bg-accent p-4 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-book-bookmark text-xl"></i>
+          <h3 class="font-bold text-base">Vademécum Teórico: Fisicoquímica Metabólica y Bioenergética</h3>
+        </div>
+        <button onclick="closeFormulasModal()" class="text-white hover:text-gray-200 transition">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+      
+      <div class="p-6 overflow-y-auto space-y-6 text-xs md:text-sm text-gray-700 custom-scroll leading-relaxed">
+        
+        <!-- Sección 1: Definición y Acoplamiento -->
+        <div class="border-b border-gray-100 pb-4">
+          <h4 class="font-bold text-accent text-sm mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-link"></i> 1. Concepto de Metabolismo y Acoplamiento Termodinámico
+          </h4>
+          <p class="text-xs text-gray-600 mb-2">
+            Red coordinada e integrada de reacciones químicas celulares destinadas a transformar nutrientes, sintetizar biomoléculas, producir energía útil (ATP) y eliminar desechos.
+          </p>
+          <div class="bg-slate-50 p-3 rounded-xl border border-gray-200 text-xs space-y-1.5">
+            <p><strong>Primer Principio & Ley de Hess:</strong> La energía total se conserva. Una reacción endergónica no espontánea (&Delta;G &gt; 0) ocurre obligatoriamente acoplada a una reacción catabólica fuertemente exergónica (&Delta;G &lt; 0), garantizando que el <em>&Delta;G global neto sea menor que cero</em>.</p>
+            <p><strong>Hidrólisis de ATP:</strong> ATP + H<sub>2</sub>O &rarr; ADP + Pi (&Delta;G&deg;' = -30.5 kJ/mol; en condiciones fisiológicas intracelulares alcanza &asymp; -50 kJ/mol).</p>
+          </div>
+        </div>
+
+        <!-- Sección 2: Catabolismo vs Anabolismo -->
+        <div class="border-b border-gray-100 pb-4">
+          <h4 class="font-bold text-accent text-sm mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-code-compare"></i> 2. Cuadro Comparativo: Catabolismo vs. Anabolismo
+          </h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <div class="bg-orange-50/70 p-3 rounded-xl border border-orange-200">
+              <span class="font-bold text-orange-700 block mb-1">Fase Catabólica (Degradación):</span>
+              <ul class="space-y-1 text-gray-600 list-disc list-inside">
+                <li><strong>Termodinámica:</strong> Exergónica (&Delta;G &lt; 0), libera energía libre.</li>
+                <li><strong>Mecanismo Redox:</strong> Reacciones oxidativas (pérdida de e<sup>-</sup> y H<sup>+</sup>).</li>
+                <li><strong>Geometría:</strong> Convergente (múltiples sustratos &rarr; Acetil-CoA).</li>
+                <li><strong>Coenzimas:</strong> Reduce NAD<sup>+</sup> a NADH y FAD a FADH<sub>2</sub>.</li>
+                <li><strong>Rutas clave:</strong> Glucólisis, &beta;-oxidación, Ciclo de Krebs.</li>
+              </ul>
+            </div>
+            <div class="bg-emerald-50/70 p-3 rounded-xl border border-emerald-200">
+              <span class="font-bold text-emerald-700 block mb-1">Fase Anabólica (Biosíntesis):</span>
+              <ul class="space-y-1 text-gray-600 list-disc list-inside">
+                <li><strong>Termodinámica:</strong> Endergónica (&Delta;G &gt; 0), consume energía libre.</li>
+                <li><strong>Mecanismo Redox:</strong> Reacciones reductivas (ganancia de e<sup>-</sup> y H<sup>+</sup>).</li>
+                <li><strong>Geometría:</strong> Divergente (pocos precursores &rarr; múltiples macromoléculas).</li>
+                <li><strong>Coenzimas:</strong> Consume ATP y coenzimas reducidas (NADPH).</li>
+                <li><strong>Rutas clave:</strong> Síntesis de proteínas, glucogénesis, lipogénesis.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección 3: Compartimentalización Topográfica -->
+        <div class="border-b border-gray-100 pb-4">
+          <h4 class="font-bold text-accent text-sm mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-microscope"></i> 3. Compartimentalización Celular & Evitación de Ciclos Fútiles
+          </h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <div class="bg-slate-50 p-3 rounded-xl border border-gray-200">
+              <strong class="text-accent block mb-1">Matriz Mitocondrial:</strong>
+              <p class="text-gray-600">&bull; Ciclo de Krebs (8 pasos oxidativos).<br>
+              &bull; &beta;-oxidación de ácidos grasos (lanzadera de carnitina).<br>
+              &bull; Cadena de transporte de electrones y fosforilación oxidativa (ATP sintasa).</p>
+            </div>
+            <div class="bg-slate-50 p-3 rounded-xl border border-gray-200">
+              <strong class="text-accent block mb-1">Citosol Celular:</strong>
+              <p class="text-gray-600">&bull; Glucólisis (glucosa &rarr; 2 piruvato).<br>
+              &bull; Glucogénesis (reserva de glucógeno hepato-muscular).<br>
+              &bull; Lipogénesis de novo (complejo ácido graso sintasa).<br>
+              &bull; Vía de las pentosas fosfato (productora de NADPH).</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección 4: Articulación Kinésica y Metabólica -->
+        <div>
+          <h4 class="font-bold text-accent text-sm mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-person-walking"></i> 4. Adaptaciones Fisiológicas en Kinesiología
+          </h4>
+          <div class="bg-slate-50 p-3 rounded-xl border border-gray-200 text-xs space-y-2">
+            <p><strong>Ejercicio Máximo y Vía Glucolítica:</strong> La contracción explosiva hidroliza rápidamente el ATP sarcomérico; para evitar el bloqueo glucolítico por falta de NAD<sup>+</sup>, la Lactato Deshidrogenasa (LDH) reduce piruvato a lactato reciclando el aceptor oxidado.</p>
+            <p><strong>Ejercicio Prolongado y Crossover Energético:</strong> Agotado el glucógeno celular (&gt; 35-40 min de esfuerzo submáximo), la matriz mitocondrial activa intensamente la &beta;-oxidación de ácidos grasos libres movilizados desde el adipocito.</p>
+            <p><strong>Regeneración Tisular:</strong> La sobrecarga mecánica en kinesioterapia induce la vía mTOR, estimulando la traducción ribosomal de actina y miosina a expensas de ATP y GTP.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL DE GUÍA DE USO / TUTORIAL OFICIAL UCCUYO                            -->
+  <!-- ========================================================================= -->
+  <div id="modal-tutorial" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white max-w-3xl w-full rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="bg-accent p-4 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-circle-question text-xl"></i>
+          <h3 class="font-bold text-base">Guía de Uso del Simulador y Orientación Pedagógica</h3>
+        </div>
+        <button onclick="closeTutorial()" class="text-white hover:text-gray-200 transition">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+      
+      <div class="p-6 overflow-y-auto space-y-5 text-xs md:text-sm text-gray-600 custom-scroll leading-relaxed">
+        <div>
+          <h4 class="font-bold text-accent text-sm mb-1 flex items-center gap-2">
+            <i class="fa-solid fa-bullseye"></i> 1. Propósito Tecnopedagógico
+          </h4>
+          <p>
+            Diseñado para estudiantes del curso de ingreso a la <strong>Licenciatura en Kinesiología y Fisiatría (Facultad de Ciencias Médicas - UCCuyo)</strong>. Permite experimentar los principios bioenergéticos del metabolismo celular, el acoplamiento termodinámico y su relevancia en el ejercicio físico, reposo y rehabilitación.
+          </p>
+        </div>
+
+        <div class="border-t border-gray-100 pt-3">
+          <h4 class="font-bold text-accent text-sm mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-gauge-high"></i> 2. Monitor Global de Homeostasis Celular (Cabecera)
+          </h4>
+          <p class="text-xs text-gray-600 mb-1">
+            En la barra superior dispones de un monitor fisiológico en tiempo real:
+          </p>
+          <ul class="list-disc list-inside text-gray-500 space-y-0.5 text-xs">
+            <li><strong>Carga Energética (ATP/ADP):</strong> Representa el porcentaje de fosforilación de los adenilatos (normal: &asymp; 0.78-0.82; durante el esfuerzo agudo desciende a &asymp; 0.45 activando la glucólisis).</li>
+            <li><strong>Pool Redox (NADH/NAD<sup>+</sup>):</strong> Muestra la disponibilidad de electrones para la cadena respiratoria y la demanda de reciclaje oxidativo.</li>
+          </ul>
+        </div>
+
+        <div class="border-t border-gray-100 pt-3">
+          <h4 class="font-bold text-accent text-sm mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-compass"></i> 3. Guía Detallada por Módulos
+          </h4>
+          <div class="space-y-3.5 text-xs">
+            
+            <div class="bg-gray-50 p-3.5 rounded-xl border border-gray-200">
+              <strong class="text-accent block mb-1">
+                <i class="fa-solid fa-link mr-1"></i> Módulo 1 &bull; Visión General & Acoplamiento Termodinámico
+              </strong>
+              <p class="text-gray-600 mb-1">
+                Comprende cómo los procesos no espontáneos son forzados a ocurrir mediante la energía liberada por el ATP y reacciones redox.
+              </p>
+              <ul class="list-disc list-inside text-gray-500 space-y-0.5">
+                <li><strong>Calculadora de Balance &Delta;G:</strong> Seleccioná un proceso endergónico (fosforilación de glucosa, síntesis de glutamina, esterificación o activación de aminoácidos) y contrastalo con la hidrólisis de 1 o 2 ATP (&Delta;G<sub>2</sub> &lt; 0).</li>
+                <li><strong>Perfil SVG de Energía Libre:</strong> Comprobá cómo la curva roja (+&Delta;G, inviable) se transforma en la curva verde descendente (-&Delta;G global neto, espontánea).</li>
+                <li><strong>Lanzadera Redox en Vivo:</strong> Pulsá <em>&laquo;Oxidación en Vivo&raquo;</em> para simular la cesión de 2e<sup>-</sup> + 2H<sup>+</sup> desde el sustrato hacia el NAD<sup>+</sup> formando NADH.</li>
+              </ul>
+            </div>
+
+            <div class="bg-gray-50 p-3.5 rounded-xl border border-gray-200">
+              <strong class="text-accent block mb-1">
+                <i class="fa-solid fa-fire text-amber-600 mr-1"></i> Módulo 2 &bull; Laboratorio Catabólico (Rutas Exergónicas Convergentes)
+              </strong>
+              <p class="text-gray-600 mb-1">
+                Analiza las rutas oxidativas que degradan nutrientes en metabolitos comunes.
+              </p>
+              <ul class="list-disc list-inside text-gray-500 space-y-0.5">
+                <li><strong>Rutas Clave:</strong> Alterná entre <em>Glucólisis citosólica</em> (inversión, escisión y rendimiento neto de 2 ATP + 2 NADH), <em>&beta;-Oxidación mitocondrial</em> (espiral de degradación grasa con gran producción energética) y <em>Ciclo de Krebs</em> (8 pasos con descarboxilaciones oxidativas y generación de NADH/FADH<sub>2</sub>).</li>
+                <li><strong>Rendimiento Estequiométrico:</strong> Monitoreá los contadores dinámicos de ATP neto, NADH, FADH<sub>2</sub> y producto final.</li>
+                <li><strong>Embudo de Convergencia:</strong> Esquema visual donde carbohidratos, lípidos y proteínas convergen hacia el <strong>Acetil-CoA</strong>.</li>
+              </ul>
+            </div>
+
+            <div class="bg-gray-50 p-3.5 rounded-xl border border-gray-200">
+              <strong class="text-accent block mb-1">
+                <i class="fa-solid fa-cubes text-emerald-600 mr-1"></i> Módulo 3 &bull; Estación de Anabolismo (Rutas Endergónicas Divergentes)
+              </strong>
+              <p class="text-gray-600 mb-1">
+                Explora la síntesis de macromoléculas complejas a partir de precursores simples.
+              </p>
+              <ul class="list-disc list-inside text-gray-500 space-y-0.5">
+                <li><strong>Biosíntesis Específica:</strong> Navegá entre <em>Proteínas</em> (traducción ribosomal con inversión de ATP/GTP para actina y miosina), <em>Glucógeno</em> (reserva hepato-muscular vía UDP-glucosa), <em>Ácidos Grasos</em> (lipogénesis citosólica con alto consumo de NADPH) y <em>Triglicéridos</em>.</li>
+                <li><strong>Costo Energético:</strong> Verificá la inversión neta de enlaces ~P y poder reductor requeridos.</li>
+                <li><strong>Cuadro Fisicoquímico:</strong> Matriz comparativa entre degradación oxidativa vs. síntesis reductiva.</li>
+              </ul>
+            </div>
+
+            <div class="bg-gray-50 p-3.5 rounded-xl border border-gray-200">
+              <strong class="text-accent block mb-1">
+                <i class="fa-solid fa-microscope text-indigo-600 mr-1"></i> Módulo 4 &bull; Compartimentalización Celular & Casos Clínico-Kinésicos
+              </strong>
+              <p class="text-gray-600 mb-1">
+                Integración espacial y adaptaciones ante diversas demandas corporales.
+              </p>
+              <ul class="list-disc list-inside text-gray-500 space-y-0.5">
+                <li><strong>Selector de Estados:</strong> Alterná entre <em>Reposo postprandial</em> (insulina alta, glucogénesis y lipogénesis activas), <em>Ejercicio agudo intenso</em> (alta demanda de ATP, glucogenólisis y producción de lactato) y <em>Ayuno prolongado</em> (glucagón alto, gluconeogénesis y cetogénesis mitocondrial).</li>
+                <li><strong>Mapa Citosol vs. Mitocondria:</strong> Observá cómo las etiquetas de actividad y los flujos metabólicos cambian de compartimento según el estado homeostático.</li>
+                <li><strong>Desafíos Clínicos:</strong> Resolvé los 3 casos prácticos aplicados a kinesiología deportiva, hipoxia tisular y rehabilitación muscular con retroalimentación formativa inmediata.</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="border-t border-gray-100 pt-3">
+          <h4 class="font-bold text-accent text-sm mb-1 flex items-center gap-2">
+            <i class="fa-solid fa-graduation-cap"></i> 4. Criterio de Evaluación y Apoyo Formativo
+          </h4>
+          <p>
+            El simulador está diseñado para el aprendizaje autónomo formativo: no aplica penalizaciones numéricas y provee explicaciones fisiológicas exhaustivas ante cada opción seleccionada. Podés consultar el <strong>Vademécum</strong> en la cabecera en cualquier momento para revisar conceptos teóricos y fórmulas.
+          </p>
+        </div>
+      </div>
+      
+      <div class="p-4 bg-gray-50 border-t border-gray-100 flex justify-end">
+        <button onclick="closeTutorial()" class="px-5 py-2.5 bg-accent hover:bg-accent-hover text-white text-xs font-semibold rounded-xl shadow-sm transition">
+          ¡Entendido, comenzar el simulador!
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pie de Página Institucional Oficial UCCuyo -->
+  <footer class="bg-white border-t border-gray-200 py-3 text-center text-xs text-gray-500 font-medium">
+    Desarrollado por vesalio - Todos los derechos reservados
+  </footer>
+
+    <!-- LÓGICA INTERACTIVA DEL SIMULADOR -->
+    <script>
+        // ==========================================
+        // GESTIÓN DE MODALES INSTITUCIONALES (U7-01)
+        // ==========================================
+        function openFormulasModal() {
+            const m = document.getElementById('modal-formulas');
+            if (m) m.classList.remove('hidden');
+        }
+
+        function closeFormulasModal() {
+            const m = document.getElementById('modal-formulas');
+            if (m) m.classList.add('hidden');
+        }
+
+        function openTutorial() {
+            const m = document.getElementById('modal-tutorial');
+            if (m) m.classList.remove('hidden');
+        }
+
+        function closeTutorial() {
+            const m = document.getElementById('modal-tutorial');
+            if (m) m.classList.add('hidden');
+        }
+
+        // ==========================================
+        // GESTIÓN DE PESTAÑAS (TABS & SIDEBAR)
+        // ==========================================
+        function switchTab(moduleId) {
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+            
+            const navButtons = [
+                { id: 'tab-btn-module-1', mod: 'module-1' },
+                { id: 'tab-btn-module-2', mod: 'module-2' },
+                { id: 'tab-btn-module-3', mod: 'module-3' },
+                { id: 'tab-btn-module-4', mod: 'module-4' }
+            ];
+
+            navButtons.forEach(btn => {
+                const el = document.getElementById(btn.id);
+                if (el) {
+                    if (btn.mod === moduleId) {
+                        el.className = 'bg-accent text-white flex-1 lg:flex-none text-left py-2.5 px-4 rounded-xl text-sm font-semibold transition shadow-sm flex items-center gap-2';
+                    } else {
+                        el.className = 'text-gray-700 hover:bg-gray-100 flex-1 lg:flex-none text-left py-2.5 px-4 rounded-xl text-sm font-medium transition flex items-center gap-2';
+                    }
+                }
+            });
+
+            const targetPane = document.getElementById(moduleId);
+            if (targetPane) targetPane.classList.remove('hidden');
+        }
+
+        // ==========================================
+        // MÓDULO 1: ACOPLAMIENTO TERMODINÁMICO ΔG
+        // ==========================================
+        function calculateCoupling() {
+            const endergonicSelect = document.getElementById('endergonic-select');
+            const deltaG1 = parseFloat(endergonicSelect.value);
+            const selectedOption = endergonicSelect.options[endergonicSelect.selectedIndex];
+            document.getElementById('endergonic-desc').innerText = selectedOption.getAttribute('data-desc');
+
+            const exergonicDrive = parseFloat(document.querySelector('input[name="exergonic-drive"]:checked').value);
+
+            const netDeltaG = deltaG1 + exergonicDrive;
+            const eqDisplay = document.getElementById('equation-display');
+            eqDisplay.innerText = `(+${deltaG1.toFixed(1)}) + (${exergonicDrive.toFixed(1)}) = ${netDeltaG.toFixed(1)} kJ/mol`;
+
+            const badge = document.getElementById('equation-badge');
+            const thermoStatus = document.getElementById('thermo-status');
+            const svgCoupledPath = document.getElementById('svg-coupled-path');
+            const svgCoupledText = document.getElementById('svg-coupled-text');
+
+            if (netDeltaG < 0) {
+                badge.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-synthesis-50 text-synthesis-600 border border-synthesis-500/30";
+                badge.innerText = "Reacción Favorable Termodinámicamente (Espontánea)";
+                thermoStatus.className = "text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800";
+                thermoStatus.innerText = "Espontánea (Viable)";
+
+                // Curva SVG descendente hacia abajo de la línea cero
+                svgCoupledPath.setAttribute('d', 'M 40,90 Q 120,40 210,105');
+                svgCoupledPath.setAttribute('stroke', '#10b981');
+                svgCoupledText.setAttribute('y', '108');
+                svgCoupledText.setAttribute('fill', '#047857');
+                svgCoupledText.textContent = `ΔG Net = ${netDeltaG.toFixed(1)} kJ/mol (Exergónico)`;
+            } else {
+                badge.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-red-50 text-red-600 border border-red-500/30";
+                badge.innerText = "Reacción No Espontánea (Requiere mayor inversión energética)";
+                thermoStatus.className = "text-xs font-bold px-2.5 py-1 rounded-full bg-red-100 text-red-800";
+                thermoStatus.innerText = "No Viable";
+
+                // Curva SVG ascendente
+                svgCoupledPath.setAttribute('d', 'M 40,90 Q 130,40 210,75');
+                svgCoupledPath.setAttribute('stroke', '#ea580c');
+                svgCoupledText.setAttribute('y', '72');
+                svgCoupledText.setAttribute('fill', '#ea580c');
+                svgCoupledText.textContent = `ΔG Net = +${netDeltaG.toFixed(1)} kJ/mol (Inviable)`;
+            }
+        }
+
+        // ==========================================
+        // MÓDULO 1: SIMULADOR REDOX (NAD+ / NADH)
+        // ==========================================
+        let isOxidized = false;
+        function toggleRedoxState() {
+            isOxidized = !isOxidized;
+            const subBox = document.getElementById('substrate-box');
+            const coBox = document.getElementById('coenzyme-box');
+            const subState = document.getElementById('substrate-state');
+            const coName = document.getElementById('coenzyme-name');
+            const coState = document.getElementById('coenzyme-state');
+            const arrow = document.getElementById('redox-arrow');
+            const detailText = document.getElementById('redox-detail-text');
+
+            if (isOxidized) {
+                subBox.className = "col-span-4 p-3 bg-slate-50 border-2 border-slate-300 rounded-xl shadow-xs transition-all";
+                subState.className = "block text-[10px] text-slate-500 font-semibold mt-1";
+                subState.innerText = "Oxidado (Cede electrones)";
+
+                coBox.className = "col-span-4 p-3 bg-cyan-50 border-2 border-cyan-500 rounded-xl shadow-md transition-all";
+                coName.innerText = "NADH + H⁺";
+                coState.className = "block text-[10px] text-cyan-700 font-bold mt-1";
+                coState.innerText = "Forma Reducida (Cargada)";
+
+                arrow.className = "fa-solid fa-arrow-right text-emerald-500 text-xl scale-125 transition-transform duration-300";
+                detailText.innerHTML = "<strong>¡Oxidación completa!</strong> El sustrato ha transferido 2 electrones y un protón al nucleótido de nicotinamida. El <strong>NADH</strong> ahora viaja al Complejo I mitocondrial para bombear 4 protones al espacio intermembrana.";
+                document.getElementById('redox-meter-val').innerText = "Ratio: 0.35 (Alto e⁻)";
+            } else {
+                subBox.className = "col-span-4 p-3 bg-white border-2 border-catabolic-500 rounded-xl shadow-xs transition-all";
+                subState.className = "block text-[10px] text-emerald-600 font-semibold mt-1";
+                subState.innerText = "Forma Reducida (Rico en e⁻)";
+
+                coBox.className = "col-span-4 p-3 bg-white border-2 border-slate-300 rounded-xl shadow-xs transition-all";
+                coName.innerText = "NAD⁺";
+                coState.className = "block text-[10px] text-slate-500 font-semibold mt-1";
+                coState.innerText = "Forma Oxidada (Disponible)";
+
+                arrow.className = "fa-solid fa-arrow-right text-blue-500 text-lg transition-transform duration-300";
+                detailText.innerHTML = "Estado basal. El sustrato contiene energía potencial química en sus enlaces reducidos C-H y C-OH.";
+                document.getElementById('redox-meter-val').innerText = "Ratio: 0.12 (Normal)";
+            }
+        }
+
+        // ==========================================
+        // MÓDULO 2: RUTAS CATABÓLICAS CONVERGENTES
+        // ==========================================
+        const catabolicData = {
+            glycolysis: {
+                title: "Glucólisis Citosólica (Vía de Embden-Meyerhof)",
+                location: "Citosol celular",
+                atp: "+2 ATP Netos (Invierte 2, Genera 4)",
+                nadh: "2 NADH",
+                fadh: "0 FADH₂",
+                finalProd: "2 Piruvato (3C)",
+                steps: [
+                    { name: "Fase de Inversión", desc: "La glucosa (6C) se fosforila dos veces a expensas de 2 ATP para atraparla dentro de la célula y activar la molécula." },
+                    { name: "Fase de Escisión", desc: "La Fructosa-1,6-bisfosfato se rompe en dos triosas fosfato (Gliceraldehído-3-P y DHAP)." },
+                    { name: "Fase de Rendimiento", desc: "Oxidación por GAPDH con generación de 2 NADH y síntesis de 4 ATP por fosforilación a nivel de sustrato." }
+                ],
+                clinicalNote: "En contracción muscular explosiva (ej. sprint en Kinesiología), si el suministro de O₂ es insuficiente, el piruvato se reduce a lactato para regenerar NAD⁺ citosólico."
+            },
+            betaox: {
+                title: "Beta-Oxidación Mitocondrial de Ácidos Grasos",
+                location: "Matriz Mitocondrial",
+                atp: "~ +106 ATP (Palmitato 16C, tras Krebs y CTE)",
+                nadh: "7 NADH (por palmitato)",
+                fadh: "7 FADH₂ (por palmitato)",
+                finalProd: "8 Acetil-CoA",
+                steps: [
+                    { name: "Activación y Transporte", desc: "Unión a Coenzima A en citosol e ingreso mitocondrial mediante la lanzadera de Carnitina (CPT-1 y CPT-2)." },
+                    { name: "Espiral de 4 Pasos", desc: "Oxidación por FAD, hidratación, oxidación por NAD⁺ y tiólisis por CoA." },
+                    { name: "Liberación de 2C", desc: "Cada vuelta acorta la cadena grasa en 2 átomos de carbono, desprendiendo una unidad de Acetil-CoA." }
+                ],
+                clinicalNote: "Constituye la principal fuente energética durante el ejercicio aeróbico submáximo prolongado (>30-40 min) y en el estado de ayuno fisiológico prolongado."
+            },
+            krebs: {
+                title: "Ciclo del Ácido Cítrico / Ciclo de Krebs (8 Pasos)",
+                location: "Matriz Mitocondrial",
+                atp: "+2 GTP / ATP (por glucosa / 2 Acetil-CoA)",
+                nadh: "6 NADH (por glucosa)",
+                fadh: "2 FADH₂ (por glucosa)",
+                finalProd: "4 CO₂ (Desecho total)",
+                steps: [
+                    { name: "Condensación Inicial (Paso 1)", desc: "Oxalacetato (4C) + Acetil-CoA (2C) &rarr; Citrato (6C), catalizado por la Citrato Sintasa." },
+                    { name: "Descarboxilaciones Oxidativas (Pasos 3 y 4)", desc: "Liberación de CO₂ y captación de electrones de alta energía en 2 NADH (Isocitrato DH y &alpha;-Cetoglutarato DH)." },
+                    { name: "Fosforilación a Nivel de Sustrato & Regeneración", desc: "Generación de GTP y oxidación de succinato y malato para producir FADH₂ y NADH, regenerando el Oxalacetato." }
+                ],
+                clinicalNote: "Es el eje integrador del metabolismo aerobio. Los intermediarios de Krebs pueden ser derivados para síntesis de aminoácidos (anaplerosis) según demanda celular."
+            }
+        };
+
+        function loadCatabolicPathway(pathKey) {
+            document.querySelectorAll('.cat-path-btn').forEach(b => {
+                b.className = "cat-path-btn px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition";
+            });
+            document.getElementById('btn-path-' + pathKey).className = "cat-path-btn px-3 py-1.5 text-xs font-bold rounded-lg bg-catabolic-500 text-white transition shadow-sm";
+
+            const data = catabolicData[pathKey];
+            document.getElementById('cat-atp-yield').innerText = data.atp;
+            document.getElementById('cat-nadh-yield').innerText = data.nadh;
+            document.getElementById('cat-fadh-yield').innerText = data.fadh;
+            document.getElementById('cat-final-prod').innerText = data.finalProd;
+
+            let stepsHtml = data.steps.map((st, idx) => `
+                <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-xs flex items-start gap-3">
+                    <span class="w-6 h-6 rounded-full bg-orange-100 text-catabolic-600 font-bold flex items-center justify-center text-xs shrink-0">${idx+1}</span>
+                    <div>
+                        <span class="font-bold text-xs text-slate-800 block">${st.name}</span>
+                        <p class="text-[11px] text-slate-600 mt-0.5">${st.desc}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('pathway-diagram-box').innerHTML = `
+                <div>
+                    <div class="flex items-center justify-between mb-3 border-b border-slate-200 pb-2">
+                        <div>
+                            <h4 class="font-bold text-inst-800 text-sm">${data.title}</h4>
+                            <span class="text-[10px] text-slate-500"><i class="fa-solid fa-location-dot text-catabolic-500"></i> ${data.location}</span>
+                        </div>
+                        <span class="text-[10px] font-bold uppercase bg-orange-100 text-catabolic-600 px-2 py-0.5 rounded">Exergónica Oxidativa</span>
+                    </div>
+                    <div class="space-y-2 mb-4">
+                        ${stepsHtml}
+                    </div>
+                </div>
+                <div class="p-2.5 bg-blue-50/80 rounded-lg border border-blue-200 text-blue-900 text-xs flex items-start gap-2">
+                    <i class="fa-solid fa-stethoscope text-blue-600 mt-0.5"></i>
+                    <div>
+                        <span class="font-bold">Correlación Clínica/Kinesiológica:</span>
+                        ${data.clinicalNote}
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==========================================
+        // MÓDULO 3: RUTAS ANABÓLICAS DIVERGENTES
+        // ==========================================
+        const anabolicData = {
+            protein: {
+                title: "Síntesis de Proteínas (Traducción Muscular)",
+                precursor: "Aminoácidos libres (BCAA, glutamina, etc.)",
+                product: "Cadenas Polipeptídicas (Actina, Miosina, Colágeno)",
+                atpCost: "-4 Enlaces ~P por enlace peptídico (ATP + GTP)",
+                nadphCost: "0 NADPH directo",
+                target: "Reparación y Regeneración Muscular",
+                details: "Los aminoácidos se activan uniendo ATP (formando Aminoacil-AMP) y se cargan en el ARNt. En el ribosoma citosólico se consumen moléculas de GTP para la elongación y traslocación de la cadena.",
+                kine: "Fundamental en la fase de recuperación kinesiológica: la sobrecarga mecánica estimula la síntesis proteica neta para aumentar el área de sección transversal muscular."
+            },
+            glycogen: {
+                title: "Glucogénesis (Síntesis de Glucógeno)",
+                precursor: "Glucosa-6-Fosfato (Glucosa sanguínea)",
+                product: "Glucógeno ramificado (Hepático y Muscular)",
+                atpCost: "-1 UTP / ATP por monómero incorporado",
+                nadphCost: "0 NADPH",
+                target: "Depósito de Carbohidratos de Rápido Acceso",
+                details: "La Glucosa-1-P reacciona con UTP para formar UDP-Glucosa. La Glucógeno Sintasa elonga enlaces &alpha;(1&rarr;4) y la enzima ramificante genera puntos &alpha;(1&rarr;6) para acelerar su movilización futura.",
+                kine: "El glucógeno muscular es el combustible prioritario en ejercicios intensos (>75% VO2max). Su reposición pos-ejercicio requiere carbohidratos e insulina activa."
+            },
+            fattyacids: {
+                title: "Síntesis de Novo de Ácidos Grasos (Lipogénesis)",
+                precursor: "Acetil-CoA citosólico (vía citrato liasa)",
+                product: "Palmitato (Ácido graso saturado de 16C)",
+                atpCost: "-7 ATP (en la carboxilación a Malonil-CoA)",
+                nadphCost: "-14 NADPH (Poder reductor biosintético)",
+                target: "Almacenamiento Químico Denso",
+                details: "Ocurre íntegramente en el citosol por el complejo multienzimático Ácido Graso Sintasa (FAS). Requiere gran cantidad de NADPH proveniente de la vía de las pentosas fosfato.",
+                kine: "Se activa intensamente tras ingestas ricas en carbohidratos con balance energético positivo en personas sedentarias, aumentando el tejido adiposo subcutáneo y visceral."
+            },
+            triglycerides: {
+                title: "Síntesis de Triglicéridos (Esterificación de Grasas)",
+                precursor: "Glicerol-3-Fosfato + 3 Acil-CoA grasos",
+                product: "Triacilglicerol (Gotícula lipídica)",
+                atpCost: "-6 Enlaces ~P (activación de ácidos grasos)",
+                nadphCost: "0 NADPH",
+                target: "Reserva Calórica a Largo Plazo",
+                details: "Unión de 3 moléculas de ácidos grasos activados sobre un esqueleto de glicerol-3-P catalizado por aciltransferasas en el retículo endoplasmático de hepatocitos y adipocitos.",
+                kine: "En pacientes con inmovilización prolongada o lesión medular, el desbalance calórico facilita la infiltración grasa intramuscular (esteatosis muscular), deteriorando la contractilidad."
+            }
+        };
+
+        function loadAnabolicPathway(anaKey) {
+            document.querySelectorAll('.ana-btn').forEach(b => {
+                b.className = "ana-btn p-3 rounded-xl border text-left transition-all border-slate-200 bg-white text-slate-700 hover:bg-slate-50";
+            });
+            document.getElementById('btn-ana-' + anaKey).className = "ana-btn p-3 rounded-xl border text-left transition-all border-synthesis-500 bg-synthesis-50 text-synthesis-600 shadow-xs";
+
+            const item = anabolicData[anaKey];
+            document.getElementById('ana-atp-cost').innerText = item.atpCost;
+            document.getElementById('ana-nadph-cost').innerText = item.nadphCost;
+            document.getElementById('ana-physio-target').innerText = item.target;
+
+            document.getElementById('ana-pathway-card').innerHTML = `
+                <div class="flex items-center justify-between mb-3 border-b border-slate-200 pb-2">
+                    <div>
+                        <h4 class="font-bold text-inst-800 text-sm">${item.title}</h4>
+                        <span class="text-[10px] text-slate-500"><i class="fa-solid fa-atom text-synthesis-500"></i> Precursor: ${item.precursor}</span>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase bg-emerald-100 text-synthesis-600 px-2 py-0.5 rounded">Endergónica Reductiva</span>
+                </div>
+                <div class="bg-white p-3.5 rounded-lg border border-slate-200 mb-3 space-y-2">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="text-slate-500 font-semibold">Producto Complejo Final:</span>
+                        <span class="font-bold text-slate-800">${item.product}</span>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">${item.details}</p>
+                </div>
+                <div class="p-2.5 bg-emerald-50 rounded-lg border border-emerald-200 text-emerald-900 text-xs flex items-start gap-2">
+                    <i class="fa-solid fa-person-walking text-synthesis-600 mt-0.5"></i>
+                    <div>
+                        <span class="font-bold">Relevancia en Ciencias del Movimiento y Salud:</span>
+                        ${item.kine}
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==========================================
+        // MÓDULO 4: COMPARTIMENTOS Y FISIOLOGÍA
+        // ==========================================
+        const stateConfig = {
+            rest: {
+                badge: "Estado: Reposo Postprandial (Insulina Alta)",
+                badgeClass: "px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800",
+                atpMeter: "w-[82%]",
+                atpVal: "0.82",
+                redoxVal: "Ratio: 0.10",
+                cytosolTags: [
+                    '<span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 font-bold text-[10px] rounded">Glucogénesis &uarr;</span>',
+                    '<span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 font-bold text-[10px] rounded">Lipogénesis &uarr;</span>',
+                    '<span class="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] rounded">&beta;-Oxidación &darr;</span>'
+                ],
+                cytosolRoutes: `
+                    <div class="p-2 bg-white/90 rounded-lg border border-blue-200 shadow-xs flex justify-between items-center">
+                        <span>Glucosa plasmática &rarr; Glucosa-6-P &rarr; <strong>Glucógeno</strong></span>
+                        <i class="fa-solid fa-arrow-down text-emerald-500"></i>
+                    </div>
+                    <div class="p-2 bg-white/90 rounded-lg border border-blue-200 shadow-xs flex justify-between items-center">
+                        <span>Exceso de Acetil-CoA sale como Citrato &rarr; <strong>Síntesis de Ácidos Grasos</strong></span>
+                        <i class="fa-solid fa-plus text-emerald-500"></i>
+                    </div>
+                `,
+                mitoStatus: "Tasa Basal Controlada",
+                mitoClass: "text-[10px] font-bold px-2 py-0.5 rounded bg-slate-500 text-white",
+                mitoRoutes: `
+                    <div class="p-2 bg-white rounded-lg border border-orange-200">
+                        <span class="block font-bold text-slate-700">Krebs:</span>
+                        <span class="text-slate-500 text-[11px]">Oxidación basal de piruvato derivado de dieta.</span>
+                    </div>
+                    <div class="p-2 bg-white rounded-lg border border-orange-200">
+                        <span class="block font-bold text-slate-700">&beta;-Oxidación:</span>
+                        <span class="text-red-500 font-semibold text-[11px]">Inhibida por Malonil-CoA (bloqueo CPT-1).</span>
+                    </div>
+                `,
+                desc: "<strong>Fisiología Postprandial:</strong> El aumento de insulina promueve el almacenamiento de sustratos en citosol (glucogénesis muscular y lipogénesis en hepatocitos/adipocitos). Se bloquea el ingreso mitocondrial de ácidos grasos mediante la inhibición de la carnitina palmitoil transferasa-1 (CPT-1)."
+            },
+            exercise: {
+                badge: "Estado: Ejercicio Kinesiológico Agudo (Demanda Máxima)",
+                badgeClass: "px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-orange-100 text-catabolic-600",
+                atpMeter: "w-[45%]",
+                atpVal: "0.45",
+                redoxVal: "Ratio: 0.38",
+                cytosolTags: [
+                    '<span class="px-2 py-0.5 bg-orange-100 text-catabolic-600 font-bold text-[10px] rounded">Glucogenólisis &uarr;&uarr;</span>',
+                    '<span class="px-2 py-0.5 bg-orange-100 text-catabolic-600 font-bold text-[10px] rounded">Glucólisis &uarr;&uarr;</span>',
+                    '<span class="px-2 py-0.5 bg-red-100 text-red-600 font-bold text-[10px] rounded">Lactato &uarr;</span>'
+                ],
+                cytosolRoutes: `
+                    <div class="p-2 bg-white/90 rounded-lg border border-orange-200 shadow-xs flex justify-between items-center">
+                        <span>Glucógeno muscular &rarr; Glucosa-6-P &rarr; Piruvato a alta velocidad</span>
+                        <i class="fa-solid fa-bolt text-amber-500"></i>
+                    </div>
+                    <div class="p-2 bg-white/90 rounded-lg border border-red-200 shadow-xs flex justify-between items-center text-red-700">
+                        <span>Glucólisis Anaerobia &rarr; Reducción a Lactato (Regenera NAD⁺)</span>
+                        <i class="fa-solid fa-triangle-exclamation text-red-500"></i>
+                    </div>
+                `,
+                mitoStatus: "Flujo Catabólico Máximo",
+                mitoClass: "text-[10px] font-bold px-2 py-0.5 rounded bg-catabolic-500 text-white",
+                mitoRoutes: `
+                    <div class="p-2 bg-white rounded-lg border border-orange-200">
+                        <span class="block font-bold text-catabolic-600">Ciclo de Krebs & CTE:</span>
+                        <span class="text-slate-600 text-[11px]">Bombeo masivo de H⁺ y síntesis de ATP por ATP sintasa.</span>
+                    </div>
+                    <div class="p-2 bg-white rounded-lg border border-orange-200">
+                        <span class="block font-bold text-catabolic-600">&beta;-Oxidación:</span>
+                        <span class="text-slate-600 text-[11px]">Activada si el esfuerzo es sub-máximo y prolongado.</span>
+                    </div>
+                `,
+                desc: "<strong>Fisiología del Ejercicio:</strong> La hidrólisis sarcomérica de ATP por las cabezas de miosina eleva rápidamente el AMP y ADP, activando alostéricamente la enzima fosfofructocinasa-1 (PFK-1) en el citosol y la isocitrato deshidrogenasa en la mitocondria. El flujo catabólico se incrementa hasta 100 veces sobre el nivel basal."
+            },
+            fasting: {
+                badge: "Estado: Ayuno Fisiológico Prolongado (Glucagón Alto)",
+                badgeClass: "px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800",
+                atpMeter: "w-[70%]",
+                atpVal: "0.70",
+                redoxVal: "Ratio: 0.22",
+                cytosolTags: [
+                    '<span class="px-2 py-0.5 bg-amber-100 text-amber-700 font-bold text-[10px] rounded">Gluconeogénesis &uarr;</span>',
+                    '<span class="px-2 py-0.5 bg-amber-100 text-amber-700 font-bold text-[10px] rounded">Lipólisis Periférica &uarr;</span>'
+                ],
+                cytosolRoutes: `
+                    <div class="p-2 bg-white/90 rounded-lg border border-amber-200 shadow-xs flex justify-between items-center">
+                        <span>Precursores (Lactato, Glicerol, Alanina) &rarr; Glucosa nueva al plasma</span>
+                        <i class="fa-solid fa-arrow-up text-amber-600"></i>
+                    </div>
+                    <div class="p-2 bg-white/90 rounded-lg border border-slate-200 shadow-xs flex justify-between items-center">
+                        <span>Adipocito libera Ácidos Grasos libres transportados por albúmina</span>
+                        <i class="fa-solid fa-truck text-slate-500"></i>
+                    </div>
+                `,
+                mitoStatus: "Producción de Cuerpos Cetónicos",
+                mitoClass: "text-[10px] font-bold px-2 py-0.5 rounded bg-purple-600 text-white",
+                mitoRoutes: `
+                    <div class="p-2 bg-white rounded-lg border border-orange-200">
+                        <span class="block font-bold text-catabolic-600">&beta;-Oxidación Masiva:</span>
+                        <span class="text-slate-600 text-[11px]">Saturación de Acetil-CoA en hepatocitos.</span>
+                    </div>
+                    <div class="p-2 bg-white rounded-lg border border-orange-200">
+                        <span class="block font-bold text-purple-700">Cetogénesis:</span>
+                        <span class="text-purple-600 text-[11px]">Acetoacetato y &beta;-hidroxibutirato para el cerebro y músculo.</span>
+                    </div>
+                `,
+                desc: "<strong>Fisiología del Ayuno:</strong> El glucagón hepático induce la transcripción de enzimas gluconeogénicas en el citosol. En la matriz mitocondrial, la &beta;-oxidación rinde exceso de Acetil-CoA que no puede ser totalmente procesado por Krebs (debido al desvío de oxalacetato hacia la gluconeogénesis), derivando en la producción de cuerpos cetónicos."
+            }
+        };
+
+        function updatePhysiologicalState() {
+            const key = document.getElementById('state-select').value;
+            const config = stateConfig[key];
+
+            const badge = document.getElementById('state-indicator-badge');
+            badge.className = config.badgeClass;
+            badge.innerText = config.badge;
+
+            document.getElementById('atp-meter-bar').className = `bg-amber-400 h-full ${config.atpMeter} transition-all duration-500`;
+            document.getElementById('atp-meter-val').innerText = config.atpVal;
+            document.getElementById('redox-meter-val').innerText = config.redoxVal;
+
+            document.getElementById('cytosol-activity-tags').innerHTML = config.cytosolTags.join('');
+            document.getElementById('cytosol-routes').innerHTML = config.cytosolRoutes;
+
+            const mitoBadge = document.getElementById('mito-status-badge');
+            mitoBadge.className = config.mitoClass;
+            mitoBadge.innerText = config.mitoStatus;
+
+            document.getElementById('mito-routes').innerHTML = config.mitoRoutes;
+            document.getElementById('state-description-box').innerHTML = config.desc;
+        }
+
+        // ==========================================
+        // CASOS CLÍNICO-KINESIOLÓGICOS INTERACTIVOS
+        // ==========================================
+        const clinicalCases = [
+            {
+                number: "Caso 1",
+                category: "Kinesiología Deportiva & Rendimiento",
+                question: "Un corredor de maratón entra en el km 35 y refiere fatiga extrema por agotamiento casi total del glucógeno muscular y hepático. ¿Qué adaptación fisicoquímica y metabólica mitocondrial le permite continuar la contracción muscular?",
+                options: [
+                    "Aumento de la síntesis citosólica de triglicéridos a expensas de NADPH.",
+                    "Entrada masiva de ácidos grasos a la mitocondria para sostener la &beta;-oxidación y proveer Acetil-CoA a Krebs.",
+                    "Detención de la cadena de transporte de electrones para ahorrar gradiente de protones.",
+                    "Aceleración de la glucólisis anaeróbica produciendo acumulación rápida de lactato."
+                ],
+                correct: 1,
+                feedback: "<strong>¡Correcto!</strong> Al agotarse los carbohidratos, el organismo depende de la &beta;-oxidación mitocondrial de ácidos grasos libres movilizados desde el tejido adiposo. Esta vía es altamente eficiente energéticamente por vuelta, aunque requiere mayor consumo de oxígeno por mol de ATP generado."
+            },
+            {
+                number: "Caso 2",
+                category: "Medicina Metabólica & Bioenergética",
+                question: "En una hipoxia tisular por isquemia periférica aguda (obstrucción arterial en una extremidad inferior), ¿cuál es la consecuencia fisicoquímica inmediata sobre el acoplamiento mitocondrial?",
+                options: [
+                    "Se acumulan NADH y FADH₂ porque el oxígeno no puede actuar como aceptor final de electrones en el Complejo IV, deteniendo el Ciclo de Krebs.",
+                    "La síntesis de ATP aumenta por aceleración espontánea de la &beta;-oxidación.",
+                    "El citosol se vuelve fuertemente alcalino por consumo excesivo de protones en la glucogénesis.",
+                    "El gradiente electroquímico de protones en el espacio intermembrana se incrementa al doble."
+                ],
+                correct: 0,
+                feedback: "<strong>¡Exacto!</strong> Sin O₂ como aceptor terminal en la citocromo c oxidasa (Complejo IV), la cadena respiratoria queda saturada de electrones. Los transportadores NADH y FADH₂ no pueden oxidarse de vuelta a NAD⁺ y FAD, lo que inhibe alostéricamente las deshidrogenasas del ciclo de Krebs."
+            },
+            {
+                number: "Caso 3",
+                category: "Rehabilitación Musculoesquelética",
+                question: "Durante la fase de hipertrofia muscular en kinesiología de rehabilitación, un kinesiólogo prescribe sobrecarga resistida progresiva acompañada de adecuada ingesta proteica. ¿Qué perfil termodinámico describe el proceso dentro del miocito?",
+                options: [
+                    "Proceso exergónico global espontáneo que genera ATP libre sin consumo de intermediarios.",
+                    "Proceso puramente degradativo que fragmenta miosina en monómeros de piruvato.",
+                    "Proceso endergónico y divergente acoplado al gasto de ATP y GTP para la polimerización de aminoácidos en sarcómeros.",
+                    "Oxidación total de proteínas musculares hacia urea y dióxido de carbono."
+                ],
+                correct: 2,
+                feedback: "<strong>¡Excelente análisis!</strong> La biosíntesis de filamentos contráctiles (actina y miosina) es un proceso anabólico endergónico (&Delta;G > 0) y divergente que requiere la inversión de energía química libre en forma de enlaces fosfato de alta energía (ATP en la activación del aminoácido y GTP en el ribosoma)."
+            }
+        ];
+
+        let currentCaseIndex = 0;
+        let answeredCases = [false, false, false];
+        let score = 0;
+
+        function loadCase(index) {
+            const c = clinicalCases[index];
+            document.getElementById('case-number').innerText = c.number;
+            document.getElementById('case-category').innerText = c.category;
+            document.getElementById('case-question').innerText = c.question;
+
+            const optionsContainer = document.getElementById('case-options');
+            optionsContainer.innerHTML = '';
+
+            c.options.forEach((optText, optIdx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition text-xs flex items-start gap-2 text-slate-700";
+                btn.innerHTML = `<span class="w-5 h-5 rounded-full bg-slate-100 text-slate-600 font-bold flex items-center justify-center text-[10px] shrink-0">${String.fromCharCode(65 + optIdx)}</span> <span>${optText}</span>`;
+                btn.onclick = () => selectAnswer(index, optIdx);
+                optionsContainer.appendChild(btn);
+            });
+
+            const feedbackBox = document.getElementById('case-feedback');
+            feedbackBox.className = "mt-4 hidden p-3 rounded-lg text-xs";
+            feedbackBox.innerHTML = '';
+        }
+
+        function selectAnswer(caseIdx, selectedOptIdx) {
+            if (answeredCases[caseIdx]) return;
+
+            const c = clinicalCases[caseIdx];
+            const feedbackBox = document.getElementById('case-feedback');
+            const optionsContainer = document.getElementById('case-options');
+            const buttons = optionsContainer.querySelectorAll('button');
+
+            answeredCases[caseIdx] = true;
+
+            if (selectedOptIdx === c.correct) {
+                buttons[selectedOptIdx].className = "w-full text-left p-2.5 rounded-lg border-2 border-emerald-500 bg-emerald-50 text-xs flex items-start gap-2 text-emerald-900 font-semibold";
+                feedbackBox.className = "mt-4 block p-3 rounded-lg text-xs bg-emerald-50 border border-emerald-200 text-emerald-900";
+                feedbackBox.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-1.5"></i> ${c.feedback}`;
+                score++;
+            } else {
+                buttons[selectedOptIdx].className = "w-full text-left p-2.5 rounded-lg border-2 border-red-500 bg-red-50 text-xs flex items-start gap-2 text-red-900";
+                buttons[c.correct].className = "w-full text-left p-2.5 rounded-lg border-2 border-emerald-500 bg-emerald-50 text-xs flex items-start gap-2 text-emerald-900 font-semibold";
+                feedbackBox.className = "mt-4 block p-3 rounded-lg text-xs bg-red-50 border border-red-200 text-red-900";
+                feedbackBox.innerHTML = `<i class="fa-solid fa-circle-xmark text-red-600 mr-1.5"></i> Respuesta incorrecta. La opción válida era la ${String.fromCharCode(65 + c.correct)}. ${c.feedback}`;
+            }
+        }
+
+        function nextCase() {
+            if (currentCaseIndex < clinicalCases.length - 1) {
+                currentCaseIndex++;
+                loadCase(currentCaseIndex);
+            } else {
+                currentCaseIndex = 0;
+                loadCase(currentCaseIndex);
+            }
+        }
+
+        function prevCase() {
+            if (currentCaseIndex > 0) {
+                currentCaseIndex--;
+                loadCase(currentCaseIndex);
+            }
+        }
+
+        // ==========================================
+        // INICIALIZACIÓN AL CARGAR LA VENTANA
+        // ==========================================
+        window.onload = function() {
+            calculateCoupling();
+            loadCatabolicPathway('glycolysis');
+            loadAnabolicPathway('protein');
+            updatePhysiologicalState();
+            loadCase(0);
+        };
+    </script>
+</body>
+</html>
